@@ -159,7 +159,7 @@ export default {
 													? await httpsConnect(检测主机, 检测端口, new Uint8Array(0), TCP连接, checkParsed)
 													: await httpConnect(检测主机, 检测端口, new Uint8Array(0), 代理协议 === 'https', TCP连接, checkParsed));
 									if (!tcpSocket) throw new Error('无法连接到代理服务器');
-									tlsSocket = new TlsClient(tcpSocket, { serverName: 检测主机, insecure: true });
+									tlsSocket = new TlsClient(tcpSocket, { serverName: 检测主机, insecure: false });
 									await tlsSocket.handshake();
 									await tlsSocket.write(encoder.encode(`GET /cdn-cgi/trace HTTP/1.1\r\nHost: ${检测主机}\r\nUser-Agent: Mozilla/5.0\r\nConnection: close\r\n\r\n`));
 									let responseBuffer = new Uint8Array(0), headerEndIndex = -1, contentLength = null, chunked = false;
@@ -3063,7 +3063,7 @@ async function httpsConnect(targetHost, targetPort, initialData, TCP连接, pars
 		const proxySocket = TCP连接({ hostname, port });
 		try {
 			await proxySocket.opened;
-			const socket = new TlsClient(proxySocket, { serverName: tlsServerName, insecure: true, allowChacha });
+			const socket = new TlsClient(proxySocket, { serverName: tlsServerName, insecure: false, allowChacha });
 			await socket.handshake();
 			log(`[HTTPS代理] TLS版本: ${socket.isTls13 ? '1.3' : '1.2'} | Cipher: 0x${socket.cipherSuite.toString(16)}${socket.cipherConfig?.chacha ? ' (ChaCha20)' : ' (AES-GCM)'}`);
 			return socket;
